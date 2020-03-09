@@ -47,7 +47,7 @@ export default {
 body {
   max-height: 120%;
   height: auto;
-  background: url(https://luckygame.in.th/asset/luckygame2/images/bg2.jpg)
+  background: url(https://luckygame.in.th/asset/luckygame2/images/BG_detail.jpg)
     no-repeat center top fixed #091b03;
   background-size: cover;
 }
