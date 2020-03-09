@@ -31,13 +31,19 @@ export default {
     this.fetchBoxes();
   }
 };
+
+
+
+
 </script>
 <style lang="scss">
 @import url(https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap-reboot.min.css);
 @import url(https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap-grid.min.css);
 @import url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css);
 @import url(https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css);
+@import url(https://fonts.googleapis.com/css?family=Lato|Prompt&display=swap);
 
+// <link href="https://fonts.googleapis.com/css?family=Lato|Prompt&display=swap" rel="stylesheet">
 body {
   max-height: 120%;
   height: auto;
@@ -45,6 +51,12 @@ body {
     no-repeat center top fixed #091b03;
   background-size: cover;
 }
+
+body {
+font-family: 'Prompt', sans-serif;
+// font-family: 'Lato', sans-serif;
+} 
+
 
 
 #app {

@@ -1,10 +1,11 @@
 <template>
   <nav id="navbar" class="navbar">
-    <div class="fixed-bottom" style="background-color:#333">
+    <div class="fixed-bottom" style="background-color:rgb(88, 87, 87);">
       <div class="row" style="padding:5px">
         <div class="col-2">
           <div class="icon" @click="goToApp()">
-            <i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i>
+            <!-- <i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i> -->
+            Back
           </div>
         </div>
         <div class="col-6 text-center">
@@ -12,9 +13,9 @@
             <tbody>
               <tr>
                 <td class="text-right">
-                  <i aria-hidden="true" class="fab fa-bitcoin fa-2x" style="color: yellow;"></i>
+                  <i aria-hidden="true" class="fab fa-bitcoin fa-2x" style="color: yellow;margin-right: 5px;"></i>
                 </td>
-                <td class="text-left" style="color:yellow">{{ userdata.coupon }}</td>
+                <td class="text-left" style="width:40%; color:yellow">{{ userdata.coupon }}</td>
               </tr>
             </tbody>
           </table>
@@ -24,9 +25,9 @@
             <tbody>
               <tr>
                 <td class="text-right">
-                  <img class="img-fluid" :src="userdata.img_url" alt />
+                  <img class="img-fluid" style="margin-right: 5px;" :src="userdata.img_url" alt />
                 </td>
-                <td class="text-left" style="color:white">{{ userdata.username }}</td>
+                <td class="text-left" style="color:white; width: 45%;">{{ userdata.username }}</td>
               </tr>
             </tbody>
           </table>
@@ -46,6 +47,15 @@
 
 .icon {
   cursor: pointer;
+      cursor: pointer;
+    background: linear-gradient(-45deg, #f1935d 12%, #f33636 69%);
+    width: 80px;
+    height: 36px;
+    border-radius: 13px;
+    text-align: center;
+    margin: auto;
+    color: white;
+    font-size: 21px;
 }
 
 .icon > i {

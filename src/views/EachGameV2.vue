@@ -11,7 +11,7 @@
           <div class="spinner">
             <div class="spinner-centered" style="width: 800px;">
               <div class="spin">
-                <div class="spin-pointer">
+                <div class="spin-pointer" style="  top: 57px;">
                   <div class="arrow-container">
                     <i style="color:#0f15cb;" class="fa fa-arrow-down fa-2x" aria-hidden="true"></i>
                   </div>
@@ -63,13 +63,14 @@
 .spinner-wrapper .spinner-stack {
   height: 170px;
   position: relative;
-  background-image: linear-gradient(
-    90deg,
-    hsla(0, 0%, 100%, 0),
-    hsla(0, 0%, 100%, 0.99) 16%,
-    #fff 84%,
-    hsla(0, 0%, 100%, 0)
-  );
+  // background-image: linear-gradient(
+  //   90deg,
+  //   hsla(0, 0%, 100%, 0),
+  //   hsla(0, 0%, 100%, 0.99) 16%,
+  //   #fff 84%,
+  //   hsla(0, 0%, 100%, 0)
+  // );
+  background-image: linear-gradient(90deg, rgb(179, 178, 178), rgba(76, 74, 74, 0.99) 16%, #5a5757 84%, rgb(138, 134, 134));
   overflow: inherit;
   padding: 10px 0;
 }
@@ -128,7 +129,7 @@
 
 .spin-pointer {
   position: fixed;
-  top: 60px;
+  top: 57px;
   left: 50%;
   width: 150px;
   height: 180px;
@@ -138,13 +139,13 @@
 
 .button {
   margin: auto;
-  box-shadow: 0px 5px 8px 0px #262626;
+  box-shadow: 3px 4px 6px 0px #262626;
   width: auto;
   min-width: 140px;
   max-width: 200px;
   height: 49px;
   border: 0px none;
-  background: linear-gradient(#f96d31ed 0%, #eef581 92%);
+  background: linear-gradient(#ea5211 0%, #f1f500 92%);
   color: #555555d4;
   text-align: center;
   text-decoration: none;

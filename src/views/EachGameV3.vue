@@ -130,7 +130,7 @@
 
 .spin-pointer {
   position: absolute;
-  top: 19%;
+  top: 57px;
   left: 50%;
   background-color: transparent;
   z-index: 200;

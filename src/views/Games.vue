@@ -3,12 +3,12 @@
     <div id="boxes">
       <div class="row">
         <div class="col-6 offset-3">
-          <h3 class="text-center" style="color:white">PROJECT NAME</h3>
+          <h3 class="text-center" style="color: #555555; font-size: 30px;"><u>PROJECT NAME</u></h3>
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-6 mt-2" v-for="box in getBoxes" :key="box.id">
-          <span class="price-tag" @click="$router.push(`/box/${box.id}?d=${getParams.data}&key=${getParams.key}`)">{{ box.price }}</span>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-6 mt-2" v-for="box in getBoxes" :key="box.id" v-if="box.cntproduct > 0">
+          <span class="price-tag" @click="$router.push(`/box/${box.id}?d=${getParams.data}&key=${getParams.key}`)">{{ box.price }} </span>       
           <Games :cntitem="box.cntproduct" :itemid="box.id" :param_data="getParams.data" :param_key="getParams.key" :itemname="box.namebox" :img_url="'https://luckygame.in.th/asset/luckygame2/images/' + box.boxpic" />
         </div>
       </div>
@@ -26,26 +26,74 @@ export default {
   computed : mapGetters(['getBoxes','userdata','getParams']),
 };
 </script>
+
 <style scpoed lang="scss">
+
 #boxes {
   padding-top: 20px;
 }
 
-.price-tag {
-  position: absolute;
-  text-align: center;
-  right: 0;
-  -webkit-clip-path: polygon(27% 0, 72% 0, 100% 100%, 0% 100%);
-  clip-path: polygon(27% 0, 82% 0, 100% 100%, 0% 100%);
-  background: linear-gradient(45deg, #ff832b 0%, #c71818 100%);
-  -webkit-transform: rotate(45deg);
-  transform: rotate(40deg);
-  width: 110px;
-  margin-top: 14px;
-  margin-right: -6px;
-  cursor: pointer;
+._1Nm8gCdU {
+    min-height: 35px;
+    padding: 10px 30px 11px;
+    font-weight: inherit;
+    font-style: inherit;
+    letter-spacing: 0;
+    font-family: Montserrat,-apple-system,BlinkMacSystemFont,Segoe UI,Fira Sans,Helvetica Neue,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 700;
+    margin-top: auto;
+    margin-bottom: auto;
+    white-space: nowrap;
+    outline: 0;
+    border: none;
+    border-radius: 6px;
+    display: inline-block;
+    cursor: pointer;
+    line-height: 1em;
+    transition: all .2s ease-in-out;
+    background-color: #f73859;
+    color: #fff;
 }
 
+.dot2 {
+    color: white;
+    padding: 3px;
+    text-align: center;
+    font-family: 'Sarabun';
+    margin-bottom: 5px;
+}
+
+.price-tag {
+  // position: absolute;
+  // text-align: center;
+  // right: 0;
+  // -webkit-clip-path: polygon(27% 0, 72% 0, 100% 100%, 0% 100%);
+  // clip-path: polygon(27% 0, 82% 0, 100% 100%, 0% 100%);
+  // background: linear-gradient(45deg, #ff832b 0%, #c71818 100%);
+  // -webkit-transform: rotate(45deg);
+  // transform: rotate(40deg);
+  // width: 110px;
+  // margin-top: 14px;
+  // margin-right: -6px;
+  // cursor: pointer;
+    position: absolute;
+    text-align: center;
+    right: 0;
+    -webkit-clip-path: polygon(27% 0, 72% 0, 100% 100%, 0% 100%);
+    clip-path: polygon(37% 0, 74% 0, 100% 100%, 0% 100%);
+    background: linear-gradient(45deg, #e2f548 0%, #ff0000 100%);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(40deg);
+    width: 116px;
+    margin-top: 5px;
+    margin-right: -10px;
+    cursor: pointer;
+    height: 36px;
+    font-size: 19px;
+    color: aliceblue;
+}
 
 .card {
   position: relative;
@@ -81,7 +129,6 @@ export default {
   display: block;
   margin-left: auto;
   margin-right: auto;
-   border-radius: 20px;
 }
 
 .mod-card {
@@ -89,11 +136,12 @@ export default {
 }
 
 .img-box-container {
-  border-radius: 20px;
-  -webkit-box-shadow: 0px 0px 19px 3px rgba(0,0,0,0.75);
-  -moz-box-shadow: 0px 0px 19px 3px rgba(0,0,0,0.75);
-  box-shadow: 0px 0px 19px 3px rgba(0,0,0,0.75);
+  //-webkit-box-shadow: 0px 0px 19px 3px rgba(0,0,0,0.75);
+  //-moz-box-shadow: 0px 0px 19px 3px rgba(0,0,0,0.75);
+  //box-shadow: 0px 0px 19px 3px rgba(0,0,0,0.75);
+  box-shadow: 0px 5px 8px 3px rgba(0, 0, 0, 0.75);
   cursor: pointer;
+  margin-bottom: 10px;
 }
 
 .img-box-container:hover {
@@ -117,7 +165,6 @@ export default {
 .txt-no-item {
   color: red;
   text-align: center !important;
-
 }
 
 </style>
