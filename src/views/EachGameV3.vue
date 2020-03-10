@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="d-flex justify-content-center mt-3  animated slideInUp fast">
+    <div class="d-flex justify-content-center mt-3 animated fadeInUpBig delay-2s">
       <button id="click" class="button" @click="move()">Click</button>
     </div>
 		<div class="container">
@@ -170,6 +170,8 @@ import { mapGetters } from 'vuex';
 import ItemList from '@/components/ItemList';
 import crypto, { ECDH } from 'crypto';
 import { log } from 'util';
+import Swal from 'sweetalert2';
+import Toastify  from 'toastify-js';
 export default {
 	components : {ItemList},
   data() {
@@ -180,7 +182,7 @@ export default {
       itemId: 3,
       round: 10,
       imageWidth: 200,
-      picPerPage: 14,
+      picPerPage: 0,
       chksumKey: "aofkitapigamemysterbox2020",
       stopPosition: 0,
       defaultValue: 500,
@@ -190,7 +192,9 @@ export default {
 			useridx: 0,
 			timestamp : 0,
 			itemlist : [],
-			picUrl : 'https://luckygame.in.th/asset/luckygame2/images/',
+      picUrl : 'https://luckygame.in.th/asset/luckygame2/images/',
+      realItems : [],
+      selectedItem : {},
     };
 	},
 	computed: mapGetters(['userdata']),
@@ -200,6 +204,7 @@ export default {
       const param = `idbox=${this.boxId}&timestamp=${this.timestamp}&ckSum=${ckSum}`;
       const url = `${this.defaultUrl}/apiaction/get_listboxrandom_detail?${param}`;
       const response = await axios.get(url);
+      let items = [];
 
       if (response.status !== 200) {
         this.$router.go(-1);
@@ -207,11 +212,13 @@ export default {
       }
       let data = response.data.data;
       if (data.code !== 200) {
-        alert(data.message);
+        this.alertError(data.message);
         this.$router.go(-1);
         return;
       }
-      const items = data.data;
+      items = data.data;
+      this.picPerPage = items.length;
+      this.realItems = items;
 			this.items = await this.getData(items)
 			this.itemlist = await this.getListItems(items);
 		},
@@ -255,7 +262,10 @@ export default {
 			return crypto.createHash('sha256').update(password).digest('hex');
 		},
     getRandomStopPosition() {
-      let min = (max = num = 0);
+      let min = 0;
+      let max = 0;
+      let num = 0;
+
       num = this.imageWidth / 2;
       min = num * -1;
       max = num;
@@ -264,22 +274,70 @@ export default {
     randomIntFromInterval(min,max) {
       return Math.floor(Math.random() * (max - min + 1) + min);
     },
+    afterFinished() {
+      let message = String();
+      message += `คุณได้รับ ${this.selectedItem.name}`
+      // Swal.fire({
+      //   title: 'Success',
+      //   text: message,
+      //   icon: 'success',
+      //   confirmButtonText: 'OK'
+      // }).then(res => {
+      //   this.reset();
+      // });
+
+      Swal.fire({
+        title: message,
+        text: "ต้องการแลกเป็นคูปองหรือไม่",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'แลกเป็นคูปอง',
+        cancelButtonText : 'รับไอเทม',
+      }).then((result) => {
+        if (result.value) {
+          alert('แลกคูปอง');
+          this.reset();
+        } else {
+          alert('เลือกไอเทมนี้')
+        }
+
+        this.reset();
+
+      })
+      
+    },
+    setRound() {
+      this.round = this.randomIntFromInterval(5,7);
+    },
+    setTimeStamp() {
+      this.timestamp = new Date().getTime().toString().substring(0,10);
+    },
+    reset() {
+      this.selectedItem = {};
+      this.setRound();
+      this.getRandomStopPosition();
+    
+      $("#spinner").css({
+        transform: "translate3d(-" + this.defaultValue + "px, " + 0 + "px, 0px)"
+      });
+
+      $(".spinner-direction").css('left','0');
+
+      $('#click').show();
+
+    },
     move() {
 			if(Object.keys(this.userdata).length == 0) {
-
 				let errorMsg = 'stackabuse.com';
 				let buff = new Buffer(errorMsg);
 				let base64data = buff.toString('base64');
-
-				// this.$router.go(`/error?text=${base64data}`)
-
 				window.location.href(`/error?text=${base64data}`);
-				// console.log(`/error?text=${base64data}`);
 				return;
-
 			}
-			// return;
 
+      this.setSelectedItem();
       this.calculateWidth();
 
       const spinnerItem = $(".spinner-item");
@@ -287,9 +345,16 @@ export default {
       const spinner = $("#spinner");
 
       if (spinnerItem.length == 0) {
-        alert("No Data");
+        this.alertError("No Data");
         return;
       }
+
+      if(Object.keys(this.selectedItem).length == 0) {
+        this.alertError("No Data");
+        return;
+      }
+
+      $('#click').hide();
 
       spinnerDirection.animate(
         { left: `-${this.stopPosition}` },
@@ -303,17 +368,36 @@ export default {
           duration: this.duration,
           easing: "swing",
           queue: false,
-          complete: () => alert("Fishished")
+          complete: () => this.afterFinished(),
         }
       );
     },
+    alertError(message = '') {
+      Toastify({
+        text: message,
+        duration: 1500, 
+        close: true,
+        gravity: "bottom", 
+        position: 'right', 
+        backgroundColor: "background-image: linear-gradient(to right, #d91111, #ed390c);",
+        stopOnFocus: true, 
+      }).showToast();
+    },
     calculateWidth() {
+      let firstItem = `11${this.boxId}${this.useridx}${this.chksumKey}${this.timestamp}`;
 			let hashText = `${this.round}${this.itemId}${this.boxId}${this.useridx}${this.chksumKey}${this.timestamp}`;
       let selectedItemId = md5(hashText);
-			let item = $(`#${selectedItemId}`);
-			 this.stopPosition = Math.ceil(
-        item.offset().left - 710 + this.randStopPos
-			);
+      let item = $(`#${selectedItemId}`);
+      this.stopPosition = (this.imageWidth * this.picPerPage * (this.round - 2) + ((this.itemId - 1) * this.imageWidth )) - this.defaultValue - 305 - this.randStopPos ;
+                        
+      console.log(`Stop position`,this.stopPosition,'Random Stop',this.randStopPos);
+    },
+    setSelectedItem() {
+
+      const selectedItem = this.realItems.filter((e,i) => e.itemId == this.itemId);
+      this.selectedItem = selectedItem[0];
+
+      console.log('Selected Item',this.selectedItem)
     }
   },
   mounted() {
@@ -321,16 +405,18 @@ export default {
   },
   updated() {},
 	async created() {
-		this.useridx = 69122931;
-		this.sessionId = md5(`${new Date().getTime()}${this.useridx}`);
-		this.timestamp = new Date().getTime().toString().substring(0,10);
+    // From Params
     this.boxId = this.$route.params.id;
-		this.defaultUrl = "https://back.luckygame.in.th";
-		this.round = this.randomIntFromInterval(5,7);
+    // Set Default URL
+    this.defaultUrl = "https://back.luckygame.in.th";
+
+		this.sessionId = md5(`${new Date().getTime()}${this.useridx}`);
+		this.setTimeStamp();
+		this.setRound();
+    this.getRandomStopPosition();
+    await this.getItems(this.boxId);
+
     window.me = this;
-		await this.getItems(this.boxId);
-		
-		
   }
 };
 </script>

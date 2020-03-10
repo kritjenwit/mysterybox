@@ -1,7 +1,11 @@
 <template>
   <div id="app">
 
-    <router-view />
+    <transition
+      name="fade"
+      mode="out-in">
+      <router-view />
+    </transition>
     <Navbar />
   </div>
 </template>
@@ -42,6 +46,7 @@ export default {
 @import url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css);
 @import url(https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css);
 @import url(https://fonts.googleapis.com/css?family=Lato|Prompt&display=swap);
+@import url(https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css);
 
 // <link href="https://fonts.googleapis.com/css?family=Lato|Prompt&display=swap" rel="stylesheet">
 body {
@@ -57,7 +62,14 @@ font-family: 'Prompt', sans-serif;
 // font-family: 'Lato', sans-serif;
 } 
 
+body::-webkit-scrollbar {
+  display: none;
+  -ms-overflow-style: none;
+}
 
+body {
+  -ms-overflow-style: none;
+}
 
 #app {
   padding-bottom: 60px;
@@ -80,5 +92,17 @@ font-family: 'Prompt', sans-serif;
 
 table.t-w-100p {
   width: 100%;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.3s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0
 }
 </style>
