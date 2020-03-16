@@ -7,9 +7,11 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6 col-6 mt-2" v-for="box in getBoxes" :key="box.id" v-if="box.cntproduct > 0">
-          <span class="price-tag" @click="$router.push(`/box/${box.id}?d=${getParams.data}&key=${getParams.key}`)">{{ box.price }} </span>       
-          <Games :cntitem="box.cntproduct" :itemid="box.id" :param_data="getParams.data" :param_key="getParams.key" :itemname="box.namebox" :img_url="'https://luckygame.in.th/asset/luckygame2/images/' + box.boxpic" />
+        <div class="col-lg-6 col-md-6 col-sm-6 col-6 mt-2" v-for="box in getBoxes" :key="box.id" >
+          <div class="box-container" v-if="box.cntproduct > 0">
+            <span class="price-tag" @click="$router.push(`/box/${box.id}?d=${getParams.data}&key=${getParams.key}`)">{{ box.price }} </span>       
+            <Games :cntitem="box.cntproduct" :itemid="box.id" :param_data="getParams.data" :param_key="getParams.key" :itemname="box.namebox" :img_url="'https://luckygame.in.th/asset/luckygame2/images/' + box.boxpic" />
+          </div>
         </div>
       </div>
     </div>
@@ -17,13 +19,25 @@
 </template>
 <script>
 import Games from "@/components/Games";
-import { mapGetters,mapActions } from 'vuex'
+import { mapGetters,mapActions } from 'vuex';
+import helper from './../assets/function';
 export default {
   components: { Games },
   data() {
     return {};
   },
   computed : mapGetters(['getBoxes','userdata','getParams']),
+  methods : {
+    ...mapActions(['setUserData']),
+    writeLog(message) {
+      helper.writeLog(this.userdata.useridx,message)
+    },
+  },
+  created() {
+    this.writeLog('===============================');
+    this.writeLog(`[DATETIME]:\t${helper.dateTime()}`)
+    this.writeLog(`[INIT APP]:\t${helper.time()}`)
+  }
 };
 </script>
 

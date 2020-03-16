@@ -7,6 +7,7 @@ Vue.use(Vuex)
 
 const state = {
   user : {},
+  userArr : [],
   userdata : {},
   boxes : [],
   params : {
@@ -17,6 +18,7 @@ const state = {
 
 const getters = {
   userdata : (state) => state.user,
+  userdataArr : (state) => state.userArr,
   getBoxes : (state) => state.boxes,
   getParams : (state) => state.params,
 };
@@ -71,16 +73,23 @@ const actions = {
   },
   setParams({ commit },data) {
     commit('setKeyAndData',data);
+  },
+  updatePoint({ commit },point) {
+    commit('updatePoint',point);
   }
 };
 
 const mutations = {
   setBoxes : (state,boxes) => (state.boxes = boxes),
-  setUserData : (state,user) => (state.user = user),
+  setUserData : (state,user) => {
+    state.user = user;
+    state.userArr = [user];
+  },
   setKeyAndData : (state,data) => {
     state.params.key = data.key;
     state.params.data = data.data;
-  }
+  },
+  updatePoint : (state,point) => (state.user.coupon = point),
 };
 
 

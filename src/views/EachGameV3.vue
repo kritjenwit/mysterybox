@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <div class="d-flex justify-content-center mt-3 animated fadeInUpBig delay-2s">
+    <div class="d-flex justify-content-center mt-3 animated fadeInUpBig delay-2s" v-if="boxPropsArr.length > 0">
       <button id="click" class="button" @click="move()">Click</button>
     </div>
 		<div class="container">
@@ -166,24 +166,26 @@
 import axios from "axios";
 import $ from "jquery";
 import md5 from "md5";
-import { mapGetters } from 'vuex';
+import { mapGetters,mapActions } from 'vuex';
 import ItemList from '@/components/ItemList';
 import crypto, { ECDH } from 'crypto';
 import { log } from 'util';
 import Swal from 'sweetalert2';
 import Toastify  from 'toastify-js';
+import config from './../assets/config';
+import helper from './../assets/function'
 export default {
 	components : {ItemList},
   data() {
     return {
-      defaultUrl: "",
+      defaultUrl: config.apiUrl,
       items: [],
       boxId: 0,
       itemId: 3,
       round: 10,
       imageWidth: 200,
       picPerPage: 0,
-      chksumKey: "aofkitapigamemysterbox2020",
+      chksumKey: config.chksumKey,
       stopPosition: 0,
       defaultValue: 500,
       duration: 10000,
@@ -192,17 +194,23 @@ export default {
 			useridx: 0,
 			timestamp : 0,
 			itemlist : [],
-      picUrl : 'https://luckygame.in.th/asset/luckygame2/images/',
+      picUrl : config.img_url,
       realItems : [],
       selectedItem : {},
+      alertTypeItemOption : {},
+      alertTypeCouponOption : {},
+      boxProps : {},
+      boxPropsArr : [],
+      userProps : {},
     };
 	},
-	computed: mapGetters(['userdata']),
+	computed: mapGetters(['userdata','getBoxes']),
   methods: {
+    ...mapActions(['updatePoint','setUserData','setParams']),
     async getItems(boxId) {
       const ckSum = md5(`${this.boxId}${this.timestamp}${this.chksumKey}`);
       const param = `idbox=${this.boxId}&timestamp=${this.timestamp}&ckSum=${ckSum}`;
-      const url = `${this.defaultUrl}/apiaction/get_listboxrandom_detail?${param}`;
+      const url = `${this.defaultUrl}/${config.api.getItems}?${param}`;
       const response = await axios.get(url);
       let items = [];
 
@@ -274,39 +282,118 @@ export default {
     randomIntFromInterval(min,max) {
       return Math.floor(Math.random() * (max - min + 1) + min);
     },
+    alertItemsToCoupon(options) {
+      Swal.fire(options)
+        .then(res => {
+          if(res.value) {
+            console.log(this.selectedItem);
+            const productPong = this.selectedItem.product_Pong;
+            if(productPong > 0) {
+              this.addpoint(+productPong)
+                .then(res => {
+                  console.log(res.data.data);
+                  this.writeLog(`[BOXID(${this.boxId}) => RES ADD POINT]:\t ${JSON.stringify(res.data.data)}`)
+                  const afterPoint = res.data.data.data;
+                  console.log('[ITEM TO Coupon -> ADDPOINT] Point After : ', afterPoint)
+                  this.updatePoint(afterPoint);
+                  this.writeLog(`[BOXID(${this.boxId}) => CONVERT TO PONG]:\tPoint After ${afterPoint}`)
+                })
+
+                Swal.fire({
+                  icon : 'success',
+                  title : 'แลกเป็นคูปองสำเร็จ',
+                }).then(res2 => this.reset())
+
+            } else {
+              Swal.fire({
+                icon : 'error',
+                title : 'ไม่สามารถแลกเป็นคูปองได้',
+              }).then(res2 => {
+                this.writeLog(`[BOXID(${this.boxId}) => CONVERT TO PONG ERROR]:\tไม่สามารถแลกเป็นคูปองได้`)
+                this.reset()
+              })
+            }
+          } else {
+            this.alertTypeItem();
+          }
+        });
+
+    },
+    alertTypeItem() {
+      Swal.fire(this.alertTypeItemOption)
+        .then(result => {
+          if (result.value) {
+            // กดแลกปอง
+            let options = {
+              icon : 'info',
+              title: 'แลกเป็นคูปอง',
+              text : `แลกเป็นคูปองได้ ${this.selectedItem.product_Pong} คูปอง`,
+              showCancelButton : true,
+              confirmButtonColor : '#3085d6',
+              cancelButtonColor : '#d33',
+              confirmButtonText : 'ยืนยัน',
+              cancelButtonText  : 'ยกเลิก',
+            };
+            this.alertItemsToCoupon(options)
+          } else if(result.dismiss == 'cancel') {
+            // กดรับไปเทม
+            this.recvItem();
+            Swal.fire({
+              icon : 'success',
+              title : 'รับไอเทมเรียบร้อย',
+            }).then(res => {
+              this.toastType(`กดรับไอเทม ${this.selectedItem.name}`);
+              this.writeLog(`[BOXID(${this.boxId}) => PRESS RECV ITEM]:\tกดรับไอเทม ${this.selectedItem.name}`)
+              this.reset();
+            })
+          } else if(result.dismiss == 'backdrop') {
+            this.alertTypeItem();
+          }
+        })
+    },
+    alertTypeCoupon() {
+      const itemPrice =  this.selectedItem.price;
+      console.log('[ADDPOINT] Item Price : ',itemPrice);
+      this.addpoint(itemPrice)
+        .then(res => {
+          const afterPoint =  res.data.data.data;
+          this.updatePoint(+afterPoint);
+          this.writeLog(`[BOXID(${this.boxId}) => RES ADD POINT]:\t ${JSON.stringify(res.data.data)}`)
+          console.log('[ADD POINT] Point After : ', afterPoint);
+        });
+      
+      Swal.fire(this.alertTypeCouponOption)
+        .then(res => {
+          this.reset()
+        })
+    },
     afterFinished() {
+      this.writeLog(`[BOXID(${this.boxId}) => AFTER SPIN FINISHED]`)
       let message = String();
       message += `คุณได้รับ ${this.selectedItem.name}`
-      // Swal.fire({
-      //   title: 'Success',
-      //   text: message,
-      //   icon: 'success',
-      //   confirmButtonText: 'OK'
-      // }).then(res => {
-      //   this.reset();
-      // });
+      let alertOptions = {};
+      this.writeLog(`[BOXID(${this.boxId}) => REVE ITEM]\t${message}`)
+      alertOptions.title = message;
+      alertOptions.imageUrl = this.picUrl + this.selectedItem.pic ;
+      alertOptions.imageWidth = 200;
+      alertOptions.imageHeight = 'auto';
+      this.toastType(message,'blue');
+      if(this.selectedItem.productType == 0) {
+        alertOptions.text = "ต้องการแลกเป็นคูปองหรือไม่";
+        alertOptions.showCancelButton = true;
+        alertOptions.confirmButtonColor = '#3085d6';
+        alertOptions.cancelButtonColor = '#28a745';
+        alertOptions.confirmButtonText = 'แลกเป็นคูปอง';
+        alertOptions.cancelButtonText  = 'รับไอเทม';
+        this.alertTypeItemOption = alertOptions;
+        this.writeLog(`[BOXID(${this.boxId}) => ALERT RECV OPTION]\t${JSON.stringify(alertOptions)}`)
+        this.alertTypeItem(alertOptions);
 
-      Swal.fire({
-        title: message,
-        text: "ต้องการแลกเป็นคูปองหรือไม่",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'แลกเป็นคูปอง',
-        cancelButtonText : 'รับไอเทม',
-      }).then((result) => {
-        if (result.value) {
-          alert('แลกคูปอง');
-          this.reset();
-        } else {
-          alert('เลือกไอเทมนี้')
-        }
-
-        this.reset();
-
-      })
-      
+      } else if(this.selectedItem.productType == 1 ) {
+        this.writeLog(`[BOXID(${this.boxId}) => ALERT RECV OPTION]\t${JSON.stringify(alertOptions)}`)
+        this.alertTypeCouponOption = alertOptions;
+        this.alertTypeCoupon(alertOptions)
+      }
     },
     setRound() {
       this.round = this.randomIntFromInterval(5,7);
@@ -326,36 +413,79 @@ export default {
       $(".spinner-direction").css('left','0');
 
       $('#click').show();
-
+      console.log('Reset Method is triggered')
     },
     move() {
-			if(Object.keys(this.userdata).length == 0) {
-				let errorMsg = 'stackabuse.com';
-				let buff = new Buffer(errorMsg);
-				let base64data = buff.toString('base64');
-				window.location.href(`/error?text=${base64data}`);
-				return;
-			}
-
+      // Set Selected Item
+      this.writeLog(`[BOXID(${this.boxId}) => CLICK]:\t=========================================`)
       this.setSelectedItem();
+      // Calculate Where spinner shold stop
       this.calculateWidth();
+
+      this.writeLog(`[BOXID(${this.boxId}) => SELECTED ITEM]:\t${JSON.stringify(this.selectedItem)}`)
 
       const spinnerItem = $(".spinner-item");
       const spinnerDirection = $(".spinner-direction");
       const spinner = $("#spinner");
 
+      // console.log(this.userdata.coupo);
+      if(typeof this.userdata.key == 'undefined' || isNaN(this.userdata.coupon)) {
+        this.writeLog(`[BOXID(${this.boxId}) => ERROR]:\tกรุณาออกจากเกมและเข้าใหม่`)
+        this.alertError('กรุณาออกจากเกมและเข้าใหม่');
+        return;
+      }
+
       if (spinnerItem.length == 0) {
+        this.writeLog(`[BOXID(${this.boxId}) => ERROR]:\tNo Data (1)`)
         this.alertError("No Data");
         return;
       }
 
       if(Object.keys(this.selectedItem).length == 0) {
+        this.writeLog(`[BOXID(${this.boxId}) => ERROR]:\tNo Data (2)`)
         this.alertError("No Data");
         return;
       }
 
       $('#click').hide();
 
+      // console.log(this.boxProps);
+      const boxPrice = this.boxProps.price;
+      // Update Point on Navbar
+      this.writeLog(`[BOXID(${this.boxId}) => UPDATE POINT]`)
+      this.updatePoint(this.userdata.coupon - boxPrice);
+      
+      this.toastMoveSpin(`กดเล่น ${boxPrice} ปอง`);
+      // // API Add or Sub
+      this.writeLog(`[BOXID(${this.boxId}) => CLICK SPIN AT]:\t ${helper.dateTime()}`);
+      this.cutpoint(boxPrice)
+        .then(res => {
+          let afterPoint = +res.data.data.data;
+          this.writeLog(`[BOXID(${this.boxId}) => RES CUT POINT]:\t ${JSON.stringify(res.data.data)}`)
+          console.log('[CUTPOINT] Point After : ', afterPoint);
+
+          this.writeLog(`[BOXID(${this.boxId}) => AFTER POINT]:\t ${afterPoint}`)
+        });
+
+      this.moveSpinner();
+    },
+    toastType(message,color = 'green',duration = '2000') {
+      Toastify({
+        text: `${message}`,
+        duration: duration, 
+        close: true,
+        gravity: "bottom", 
+        position: 'right', 
+        // backgroundColor: "background-image: linear-gradient(to right, #d91111, #ed390c);",
+        backgroundColor: color,
+        stopOnFocus: true, 
+      }).showToast();
+    },
+    toastMoveSpin(message) {
+      this.toastType(message);
+    },
+    moveSpinner() {
+      const spinnerDirection = $(".spinner-direction");
       spinnerDirection.animate(
         { left: `-${this.stopPosition}` },
         {
@@ -373,15 +503,7 @@ export default {
       );
     },
     alertError(message = '') {
-      Toastify({
-        text: message,
-        duration: 1500, 
-        close: true,
-        gravity: "bottom", 
-        position: 'right', 
-        backgroundColor: "background-image: linear-gradient(to right, #d91111, #ed390c);",
-        stopOnFocus: true, 
-      }).showToast();
+      this.toastType(message,'red');
     },
     calculateWidth() {
       let firstItem = `11${this.boxId}${this.useridx}${this.chksumKey}${this.timestamp}`;
@@ -392,14 +514,92 @@ export default {
                         
       console.log(`Stop position`,this.stopPosition,'Random Stop',this.randStopPos);
     },
+    getTimeStamp(end = 10,start = 0) {
+      return new Date().getTime().toString().substr(start,end);
+    },
     setSelectedItem() {
 
       const selectedItem = this.realItems.filter((e,i) => e.itemId == this.itemId);
       this.selectedItem = selectedItem[0];
 
       console.log('Selected Item',this.selectedItem)
-    }
+    },
+    setBoxProps() {
+      const boxProps = this.getBoxes.filter((e,i) => e.id == this.boxId);
+      this.boxProps = boxProps[0];
+      this.boxPropsArr = boxProps;
+    },  
+    apiMliveAddOrSub(type,coupon) {
+      return new Promise((resolve,reject) => {
+        let idx = this.userdata.useridx;
+        let key = this.userdata.key;
+        let boxId = this.boxId;
+        let crystal = this.userdata.coupon;
+        let price = coupon;
+        let timestamp = this.getTimeStamp();
+        let itemId = +this.selectedItem.itemId;
+        let chksumKey = config.addorsubChksumKey;
+        let cksum = `${idx}${key}${type}${boxId}${crystal}${price}${timestamp}${itemId}${chksumKey}`;
+
+        const url = `${this.defaultUrl}/${config.api.addOrSub}`;
+        const data = {
+          idx : +idx,
+          key : this.userdata.key,
+          type : type,
+          idbox : +boxId,
+          crystal : +crystal,
+          price : +price,
+          timestamp : +this.getTimeStamp(),
+          itemId : itemId,
+          ckSum : md5(cksum),
+        } 
+       
+        const typeMessage = type == 0 ? 'RES CUTPOINT' : 'RES ADDPOINT'; 
+        const sendMessage = type == 0 ? 'DATA CUTPOINT' : 'DATA ADDPOINT'; 
+        this.writeLog(`[BOXID(${this.boxId}) => ${sendMessage}]:\t ${JSON.stringify(data)}`)
+        const response = axios.post(url,data)
+        resolve(response);
+      })
+    },
+    recvItem() {
+      let idx = this.userdata.useridx;
+      let key = this.userdata.key;
+      let boxId = this.boxId;
+      let itemId = this.selectedItem.itemId;
+      let timestamp = this.getTimeStamp();
+      let chksumKey = config.addorsubChksumKey;
+      let cksum = `${idx}${key}${itemId}${boxId}${timestamp}${chksumKey}`;
+      // -------------------------
+      const url = `${this.defaultUrl}/${config.api.recvItem}`;
+      const data = {
+        idx: idx,
+        key: key,
+        itemId: itemId,
+        idbox : boxId,
+        timestamp : timestamp,
+        ckSum : md5(cksum),
+      };
+     
+      axios.post(url,data)
+        .then(res => {
+          this.writeLog(`[BOXID(${this.boxId}) => RES RECV ITEM]:\t ${JSON.stringify(res.data.data)}`)
+          console.log(res.data)
+        })
+
+    },
+    addpoint(coupon) {
+      this.writeLog(`[BOXID(${this.boxId}) => ADDPOINT]:\t ${helper.dateTime()}`);
+      return this.apiMliveAddOrSub(1,coupon)
+    },
+    cutpoint(coupon) {
+      this.writeLog(`[BOXID(${this.boxId}) => CUTPOINT]:\t ${helper.dateTime()}`);
+      return this.apiMliveAddOrSub(0,coupon)
+    },
+    writeLog(message) {
+      helper.writeLog(this.userdata.useridx,message)
+    },
   },
+  
   mounted() {
 		$("#spinner").css({transform: "translate3d(-" + this.defaultValue + "px, " + 0 + "px, 0px)"});
   },
@@ -407,16 +607,19 @@ export default {
 	async created() {
     // From Params
     this.boxId = this.$route.params.id;
-    // Set Default URL
-    this.defaultUrl = "https://back.luckygame.in.th";
-
 		this.sessionId = md5(`${new Date().getTime()}${this.useridx}`);
 		this.setTimeStamp();
 		this.setRound();
     this.getRandomStopPosition();
     await this.getItems(this.boxId);
-
+    this.setBoxProps();
     window.me = this;
+
+    let messageLog = String();
+    this.writeLog(`[BOXID(${this.boxId}) => DATETIME]:\t${helper.dateTime()}`)
+    this.writeLog(`[BOXID(${this.boxId}) => IDX]:\t${this.userdata.useridx}`)
+    this.writeLog(`[BOXID(${this.boxId}) => KEY]:\t${this.userdata.key}`)
+    this.writeLog(`[BOXID(${this.boxId}) => COUPON]:\t${this.userdata.coupon}`)
   }
 };
 </script>

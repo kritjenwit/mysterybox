@@ -17,7 +17,12 @@ export default {
     };
 	},
 	created() {
-		this.errorName = Buffer.from(this.$route.query.text,'base64').toString();
+    this.errorName = Buffer.from(this.$route.query.text,'base64').toString();
+    
+    setTimeout(() => {
+      alert('Exit');
+    },1000)
+
 	}
 };
 </script>
