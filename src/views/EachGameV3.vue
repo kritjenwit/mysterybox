@@ -181,7 +181,7 @@ export default {
       defaultUrl: config.apiUrl,
       items: [],
       boxId: 0,
-      itemId: 3,
+      itemId: 4,
       round: 10,
       imageWidth: 200,
       picPerPage: 0,
@@ -205,6 +205,8 @@ export default {
       isexchange : 0,
       pointBefore : 0,
       pointAfter : 0,
+      isItem : 0,
+      productPong : 0,
     };
 	},
 	computed: mapGetters(['userdata','getBoxes','getLanguage']),
@@ -290,13 +292,17 @@ export default {
         .then(res => {
           if(res.value) {
             console.log(this.selectedItem);
+            this.isexchange = 1;
             const productPong = this.selectedItem.product_Pong;
+            this.isItem = 0;
             if(productPong > 0) {
               this.addpoint(+productPong)
                 .then(res => {
                   console.log(res.data.data);
                   this.writeLog(`[BOXID(${this.boxId}) => RES ADD POINT]:\t ${JSON.stringify(res.data.data)}`)
                   const afterPoint = res.data.data.data;
+                  this.pointAfter = afterPoint;
+                  this.productPong = productPong;
                   console.log('[ITEM TO Coupon -> ADDPOINT] Point After : ', afterPoint)
                   this.updatePoint(afterPoint);
                   this.writeLog(`[BOXID(${this.boxId}) => CONVERT TO PONG]:\tPoint After ${afterPoint}`)
@@ -346,6 +352,7 @@ export default {
               title : 'รับไอเทมเรียบร้อย',
             }).then(res => {
               this.toastType(`กดรับไอเทม ${this.selectedItem.name}`);
+              this.isitem = 1;
               this.writeLog(`[BOXID(${this.boxId}) => PRESS RECV ITEM]:\tกดรับไอเทม ${this.selectedItem.name}`)
               this.reset();
             })
@@ -407,11 +414,21 @@ export default {
     setTimeStamp() {
       this.timestamp = new Date().getTime().toString().substring(0,10);
     },
-    reset() {
+    async reset() {
+      await this.insertLogBet();
+
+
+
       this.selectedItem = {};
       this.setRound();
       this.getRandomStopPosition();
-    
+
+      this.isexchange = 0;
+      this.pointBefore = 0;
+      this.pointAfter = 0;
+      this.isItem = 0;
+      this.productPong = 0;
+
       $("#spinner").css({
         transform: "translate3d(-" + this.defaultValue + "px, " + 0 + "px, 0px)"
       });
@@ -419,6 +436,7 @@ export default {
       $(".spinner-direction").css('left','0');
 
       $('#click').show();
+
       console.log('Reset Method is triggered')
     },
     move() {
@@ -427,6 +445,7 @@ export default {
       this.setSelectedItem();
       // Calculate Where spinner shold stop
       this.calculateWidth();
+      
 
       this.writeLog(`[BOXID(${this.boxId}) => SELECTED ITEM]:\t${JSON.stringify(this.selectedItem)}`)
 
@@ -457,7 +476,7 @@ export default {
 
       // console.log(this.boxProps);
       const boxPrice = this.boxProps.price;
-     
+      this.pointBefore = this.userdata.coupon;
       // Update Point on Navbar
       this.writeLog(`[BOXID(${this.boxId}) => UPDATE POINT]`)
       this.updatePoint(this.userdata.coupon - boxPrice);
@@ -603,17 +622,38 @@ export default {
     writeLog(message) {
       helper.writeLog(this.userdata.useridx,message)
     },
-    insertLogBet() {
+    async insertLogBet() {
       const useridx = this.userdata.useridx;
-      const price = this.boxProps.price;
-      const boxId = this.boxId;
-      const itemId = this.selectedItem.itemId;
-      const isitem = this.selectedItem.productType == 1 ? 1 : 0;
-      const isexchange = this.selectedItem.isexchange;
-      const crystalBefore = 0;
-      const itemPong = 0;
-      const productPong = 0;
+      const price = +this.boxProps.price;
+      const boxId = +this.boxId;
+      const itemId = +this.selectedItem.itemId;
+      const isitem = this.selectedItem.productType == 0 ? 1 : 0;
+      const isexchange = +this.isexchange;
+      const crystalBefore = +this.pointBefore;
+      const itemPong = +this.selectedItem.price;
+      const productPong = +this.selectedItem.product_Pong;
       const timestamp = helper.time();
+      const ckSum = md5(`${useridx}${price}${boxId}${itemId}${isitem}${isexchange}${crystalBefore}${timestamp}${config.addorsubChksumKey}`);
+
+      let data = {};
+      data.useridx = useridx;
+      data.price = price;
+      data.boxid = boxId;
+      data.itemId = itemId;
+      data.isitem = isitem;
+      data.isexchange = isexchange;
+      data.crystal_before = crystalBefore;
+      data.itemPong = itemPong;
+      data.product_Pong = productPong;
+      data.timestamp = timestamp;
+      data.ckSum = ckSum;
+
+      console.log(data);
+
+      const url = `${config.apiUrl}/${config.api.logbet}`
+
+      await axios.post(url,data);
+
     }
   },
   
@@ -631,7 +671,7 @@ export default {
     await this.getItems(this.boxId);
     this.setBoxProps();
     window.me = this;
-    this.pointBefore = this.userdata.coupon;
+    
     let messageLog = String();
     this.writeLog(`[BOXID(${this.boxId}) => DATETIME]:\t${helper.dateTime()}`)
     this.writeLog(`[BOXID(${this.boxId}) => IDX]:\t${this.userdata.useridx}`)

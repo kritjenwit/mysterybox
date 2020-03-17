@@ -8,7 +8,8 @@ const config = {
 		getItems : 'apiaction/get_listboxrandom_detail',
 		addOrSub : 'apiaction/cut_add_pointMlive',
 		recvItem : 'apiaction/get_Product',
-		logFile  : 'apiaction/app_log_file'
+		logFile  : 'apiaction/app_log_file',
+		logbet   : 'apiaction/logbet',
 	},
 	crypto : {
 		algo : {

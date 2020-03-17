@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
 import md5 from 'md5'
+import config from './../assets/config'
 
 Vue.use(Vuex)
 
@@ -37,7 +38,9 @@ const actions = {
     const user  = await axios.get(``);
   },
   async setUserData({ commit },key,userdata) {
-    const url = `https://back.luckygame.in.th/apiaction/genkey_gamesterbox?key=${key}`;
+    const ipAddress = window.ipAddress;
+    const ckSum = md5(`${ipAddress}${config.addorsubChksumKey}`);
+    const url = `https://back.luckygame.in.th/apiaction/genkey_gamesterbox?key=${key}&ip=${ipAddress}&ckSum=${ckSum}`;
     const response = await axios.get(url);
     const data = response.data.data;
 
