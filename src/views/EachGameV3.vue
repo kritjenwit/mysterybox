@@ -181,7 +181,7 @@ export default {
       defaultUrl: config.apiUrl,
       items: [],
       boxId: 0,
-      itemId: 4,
+      itemId: 3,
       round: 10,
       imageWidth: 200,
       picPerPage: 0,
@@ -310,13 +310,13 @@ export default {
 
                 Swal.fire({
                   icon : 'success',
-                  title : 'แลกเป็นคูปองสำเร็จ',
+                  title : this.$t('alertItemsToCoupon.successful_exchange'),
                 }).then(res2 => this.reset())
 
             } else {
               Swal.fire({
                 icon : 'error',
-                title : 'ไม่สามารถแลกเป็นคูปองได้',
+                title : this.$t('alertItemsToCoupon.exchange_failed'),
               }).then(res2 => {
                 this.writeLog(`[BOXID(${this.boxId}) => CONVERT TO PONG ERROR]:\tไม่สามารถแลกเป็นคูปองได้`)
                 this.reset()
@@ -335,13 +335,13 @@ export default {
             // กดแลกปอง
             let options = {
               icon : 'info',
-              title: 'แลกเป็นคูปอง',
-              text : `แลกเป็นคูปองได้ ${this.selectedItem.product_Pong} คูปอง`,
+              title: this.$t('exchange_to_coupon.title'),
+              text : `${this.$t('exchange_to_coupon.text')} ${this.selectedItem.product_Pong} ${this.$t('coupon')}`,
               showCancelButton : true,
               confirmButtonColor : '#3085d6',
               cancelButtonColor : '#d33',
-              confirmButtonText : 'ยืนยัน',
-              cancelButtonText  : 'ยกเลิก',
+              confirmButtonText : this.$t('exchange_to_coupon.confirmButtonText'),
+              cancelButtonText  : this.$t('exchange_to_coupon.cancelButtonText'),
             };
             this.alertItemsToCoupon(options)
           } else if(result.dismiss == 'cancel') {
@@ -349,9 +349,9 @@ export default {
             this.recvItem();
             Swal.fire({
               icon : 'success',
-              title : 'รับไอเทมเรียบร้อย',
+              title : this.$t('recvitem_status'),
             }).then(res => {
-              this.toastType(`กดรับไอเทม ${this.selectedItem.name}`);
+              this.toastType(`${this.$t('toast_recvitem')} ${this.selectedItem.name}`);
               this.isitem = 1;
               this.writeLog(`[BOXID(${this.boxId}) => PRESS RECV ITEM]:\tกดรับไอเทม ${this.selectedItem.name}`)
               this.reset();
@@ -380,7 +380,7 @@ export default {
     afterFinished() {
       this.writeLog(`[BOXID(${this.boxId}) => AFTER SPIN FINISHED]`)
       let message = String();
-      message += `คุณได้รับ ${this.selectedItem.name}`
+      message += `${this.$t('after_finished.recv_message')} ${this.selectedItem.name}`
       let alertOptions = {};
       this.writeLog(`[BOXID(${this.boxId}) => REVE ITEM]\t${message}`)
       alertOptions.title = message;
@@ -389,12 +389,12 @@ export default {
       alertOptions.imageHeight = 'auto';
       this.toastType(message,'blue');
       if(this.selectedItem.productType == 0) {
-        alertOptions.text = "ต้องการแลกเป็นคูปองหรือไม่";
+        alertOptions.text = this.$t('after_finished.text_exchange');
         alertOptions.showCancelButton = true;
         alertOptions.confirmButtonColor = '#3085d6';
         alertOptions.cancelButtonColor = '#28a745';
-        alertOptions.confirmButtonText = 'แลกเป็นคูปอง';
-        alertOptions.cancelButtonText  = 'รับไอเทม';
+        alertOptions.confirmButtonText = this.$t('after_finished.confirmButtonText');
+        alertOptions.cancelButtonText  = this.$t('after_finished.cancelButtonText');
         this.alertTypeItemOption = alertOptions;
         this.writeLog(`[BOXID(${this.boxId}) => ALERT RECV OPTION]\t${JSON.stringify(alertOptions)}`)
         this.alertTypeItem(alertOptions);
@@ -456,7 +456,7 @@ export default {
       // console.log(this.userdata.coupo);
       if(typeof this.userdata.key == 'undefined' || isNaN(this.userdata.coupon)) {
         this.writeLog(`[BOXID(${this.boxId}) => ERROR]:\tกรุณาออกจากเกมและเข้าใหม่`)
-        this.alertError('กรุณาออกจากเกมและเข้าใหม่');
+        this.alertError($('re_open_game'));
         return;
       }
 
@@ -481,7 +481,7 @@ export default {
       this.writeLog(`[BOXID(${this.boxId}) => UPDATE POINT]`)
       this.updatePoint(this.userdata.coupon - boxPrice);
       
-      this.toastMoveSpin(`กดเล่น ${boxPrice} ปอง`);
+      this.toastMoveSpin(`${this.$t('play')} ${boxPrice} ${this.$t('coupon')}`);
       // // API Add or Sub
       this.writeLog(`[BOXID(${this.boxId}) => CLICK SPIN AT]:\t ${helper.dateTime()} | Pay ${boxPrice}`);
       this.cutpoint(boxPrice)
