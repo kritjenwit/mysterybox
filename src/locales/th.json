@@ -1,0 +1,29 @@
+{
+  "message": "hello i18n in TH !!",
+  "project_name" : "ชื่อเกม",
+  "btn_back" : "Back",
+  "list_item" : "รายการสินค้า",
+  "coupon" : "คูปอง",
+  "connection_failed" : "ไม่สามาราถเชื่อมต่อ Server ได้",
+	"connection_failed_to_mlive" : "กลับไปยัง Mlive",
+  "exchange_to_coupon" : {
+    "title" : "แลกเป็นคูปอง",
+    "text" : "แลกเป็นคูปองได้",
+    "confirmButtonText" : "ยืนยัน",
+    "cancelButtonText" : "ยกเลิก"
+  },
+  "recvitem_status" : "รับไอเทมเรียบร้อย",
+  "toast_recvitem" : "กดรับไอเทม",
+  "alertItemsToCoupon" : {
+    "successful_exchange" : "แลกเป็นคูปองสำเร็จ",
+    "exchange_failed" : "ไม่สามารถแลกเป็นคูปองได้"
+  },
+  "after_finished" : {
+    "recv_message" : "คุณได้รับ",
+    "text_exchange" : "ต้องการแลกเป็นคูปองหรือไม่",
+    "confirmButtonText" : "แลกเป็นคูปอง",
+    "cancelButtonText" : "รับไอเทม"
+  }, 
+  "re_open_game" : "กรุณาออกจากเกมและเข้าใหม่",
+  "play" : "กดเล่น"
+}

@@ -1,14 +1,15 @@
 // Bring Environment Need
 const crypto = require('crypto');
 const md5 = require('md5');
+const config = require('./config');
 
 // Initialize Constant variable
-const _AES_256_CBC = 'aes-256-cbc';
-const _AES_256_ECB = 'aes-256-ecb';
+const _AES_256_CBC = config.crypto.algo.aes_256_cbc;
+const _AES_256_ECB = config.crypto.algo.aes_256_ecb;
 
-const _IV_LENGTH = 16;
-const _SECRET_KEY = '9a1bcd057e94667ef363a6886ce686e0';
-const _SECOND_KEY = '2a94eb59d4687fa14c7b0e93fdba0a32';
+const _IV_LENGTH = config.crypto.ivLength;
+const _SECRET_KEY = config.crypto.key.secret;
+const _SECOND_KEY = config.crypto.key.second;
 
 function doEncrypt(text, secret = null, mode, iv) {
     const secretKey = secret !== null ? secret : _SECRET_KEY;
@@ -45,7 +46,7 @@ function decryptAesEcb(text, key = null) {
 
 
 function getIv() {
-    return md5(crypto.randomBytes(16)).substr(0, 16);
+    return md5(crypto.randomBytes(_IV_LENGTH)).substr(0, _IV_LENGTH);
 }
 
 function encrypt(text, key = null) {
@@ -64,7 +65,7 @@ function encrypt(text, key = null) {
         encryptedMessage = encryptAesEcb(encryptedMessage, ivSecretKey);
         // Concat String
         const rtnMessage = encryptedMessage + ":" + encryptedIv + ":" + encryptedIvSecret;
-        return encodeURI(rtnMessage);
+        return encodeURIComponent(rtnMessage);
     } catch (e) {
         return false;
     }
@@ -72,8 +73,8 @@ function encrypt(text, key = null) {
 
 function decrypt(cipherText, key = null) {
     try {
-        const encodedCipherText = decodeURI(cipherText);
-        const explodeCipherText = cipherText.split(":");
+        const encodedCipherText = decodeURIComponent(cipherText);
+        const explodeCipherText = encodedCipherText.split(":");
         if(explodeCipherText.length != 3) {
             return false;
         }

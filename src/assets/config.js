@@ -10,6 +10,17 @@ const config = {
 		recvItem : 'apiaction/get_Product',
 		logFile  : 'apiaction/app_log_file'
 	},
+	crypto : {
+		algo : {
+			aes_256_cbc : 'aes-256-cbc',
+			aes_256_ecb : 'aes-256-ecb',
+		},
+		ivLength : 16,
+		key : {
+			secret : '0ae7365328a9af36030092497564605d',
+			second : '7cd8723c6933040274e0f76bb3b056d0',
+		}
+	}
 }
 
 module.exports = config;

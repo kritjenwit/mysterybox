@@ -3,7 +3,7 @@
     <div id="boxes">
       <div class="row">
         <div class="col-6 offset-3">
-          <h3 class="text-center" style="color: #555555; font-size: 30px;"><u>PROJECT NAME</u></h3>
+          <h3 class="text-center" style="color: #555555; font-size: 30px;"><u>{{ $t('project_name') }}</u></h3>
         </div>
       </div>
       <div class="row">
@@ -24,9 +24,9 @@ import helper from './../assets/function';
 export default {
   components: { Games },
   data() {
-    return {};
+    return {}
   },
-  computed : mapGetters(['getBoxes','userdata','getParams']),
+  computed : mapGetters(['getBoxes','userdata','getParams','getLanguage']),
   methods : {
     ...mapActions(['setUserData']),
     writeLog(message) {
@@ -36,7 +36,7 @@ export default {
   created() {
     this.writeLog('===============================');
     this.writeLog(`[DATETIME]:\t${helper.dateTime()}`)
-    this.writeLog(`[INIT APP]:\t${helper.time()}`)
+    this.writeLog(`[INIT APP]:\t${helper.time()}`);
   }
 };
 </script>

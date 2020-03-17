@@ -4,6 +4,8 @@ import Games from '@/views/Games'
 import EachGamesV3 from '@/views/EachGameV3'
 import Login from '@/components/Login'
 import ErrorPage from '@/components/ErrorPage'
+import TestPage from '@/views/Test'
+
 
 Vue.use(VueRouter)
 
@@ -27,6 +29,11 @@ const routes = [
     path : '/error',
     name : 'Error',
     component : ErrorPage
+  },
+  {
+    path : '/test',
+    name : 'Test',
+    component : TestPage
   }
 ]
 

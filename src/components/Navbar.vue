@@ -5,7 +5,7 @@
         <div class="col-2">
           <div class="icon" @click="goToApp()">
             <!-- <i class="fa fa-arrow-left fa-2x" aria-hidden="true"></i> -->
-            Back
+            {{ $t('btn_back') }}
           </div>
         </div>
         <div class="col-6 text-center">
@@ -77,12 +77,16 @@
 }
 </style>
 <script>
-import { maoGetters, mapGetters } from 'vuex';
+import { mapGetters,mapActions } from 'vuex';
+import helper from './../assets/function'
 export default {
   data() {
-    return {};
+    return {
+      
+    };
   },
   methods: {
+    ...mapActions(['setLanguage']),
     goToApp() {
       const routeName = this.$route.name;
       if(routeName == 'Games') {
@@ -90,6 +94,9 @@ export default {
       } else {
         this.$router.go(-1);
       }
+    },
+    changeLanguage(lang) {
+      this.setLanguage(lang);
     }
   },
   computed : mapGetters(['userdata'])

@@ -1,7 +1,10 @@
 <template>
   <div id="app">
     <div class="main" v-if="userdataArr.length > 0">
-      <div class="app-version">Version 0.1.0</div>
+      <div class="app-version">Version 0.1.0 [Pre-Build]</div>
+      <div style="position:absolute;top:0;left:0;">
+        <LocaleChanger />
+      </div>
       <transition name="fade" mode="out-in">
         <router-view />
       </transition>
@@ -13,10 +16,14 @@
   </div>
 </template>
 <script>
+import crypto from './assets/crypto';
 import Navbar from "@/components/Navbar";
+import LocaleChanger from "@/components/LocaleChanger";
 import { mapActions, mapGetters } from "vuex";
+import Swal from 'sweetalert2';
+import helper from './assets/function'
 export default {
-  components: { Navbar },
+  components: { Navbar,LocaleChanger },
   data() {
     return {
       key: "",
@@ -25,13 +32,39 @@ export default {
   },
   methods: {
     ...mapActions(["fetchBoxes", "setUserData", "setParams"]),
+    alertConnection() {
+      Swal.fire({
+        icon: 'error',
+        title : this.$t('connection_failed'),
+        confirmButtonText : this.$t('connection_failed_to_mlive'),
+      }).then(res => {
+        if(res.dismiss) {
+          this.alertConnection();
+        } else {
+          alert('Exit To Mlive');
+        }
+      });
+    }
   },
-  computed: mapGetters(["userdataArr",'userdata']),
+  computed: mapGetters(["userdataArr","userdata"]),
+  mounted() {
+    setTimeout(() => {
+      if(this.userdataArr.length == 0 || typeof this.userdata.key == 'undefined') {
+        this.alertConnection();
+      }
+    }, 3000);
+  },
   created() {
     this.key = this.$route.query.key;
-    const userdata = JSON.parse(
-      Buffer.from(this.$route.query.d, "base64").toString()
-    );
+    let userdata;
+    try {
+      userdata = JSON.parse(
+        Buffer.from(this.$route.query.d, "base64").toString()
+      );
+    } catch(e) {
+      userdata = null; 
+    }
+
     this.setUserData(this.key, userdata);
     const data = {
       key: this.$route.query.key,
@@ -39,7 +72,14 @@ export default {
     };
     this.setParams(data);
     this.fetchBoxes();
-   
+    
+    // const originalMessage = 'TEST';
+    // const textEncrypted = crypto.encrypt(originalMessage);
+    // const textDecrypted = crypto.decrypt(textEncrypted);
+    // console.log('Original Message : ', originalMessage)
+    // console.log('Encrypt : ',textEncrypted);
+    // console.log('Decrypt : ',textDecrypted);
+
   }
 };
 </script>

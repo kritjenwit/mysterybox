@@ -2,6 +2,8 @@
 const fs = require('fs');
 const config = require('./config');
 const axios = require('axios');
+const store = require('./../store/index');
+const state = store.default.state;
 // -----------------------------
 function killChars(string) {
 	if (validateInput(string)) {
@@ -100,7 +102,7 @@ function writeLog(useridx,message) {
 		message : base64encode(message),
 	};
 
-	axios.post(`${config.apiUrl}/${config.api.logFile}`,data)
+	//axios.post(`${config.apiUrl}/${config.api.logFile}`,data)
 }
 
 function validateInput(varname) {

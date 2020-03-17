@@ -1,0 +1,29 @@
+{
+  "message": "hello i18n in EN !!",
+	"project_name" : "Project Name",
+	"btn_back" : "Back",
+	"list_item" : "Item's List",
+	"coupon" : "coupons",
+	"connection_failed" : "Cannot connect to Server",
+	"connection_failed_to_mlive" : "Back to Mlive",
+	"exchange_to_coupon" : {
+		"title" : "Exchanging to Coupons",
+    "text" : "Exchange for Coupons",
+    "confirmButtonText" : "Confirm",
+    "cancelButtonText" : "Cancel"
+  },
+	"recvitem_status" : "Successfully receive an item",
+  "toast_recvitem" : "Receive an item",
+  "alertItemsToCoupon" : {
+    "successful_exchange" : "Successfully Exchange",
+    "exchange_failed" : "Cannot Exchange to Coupons"
+  },
+  "after_finished" : {
+    "recv_message" : "You've got",
+    "text_exchange" : "Would you like to Exchange",
+    "confirmButtonText" : "Exchange to Copons",
+    "cancelButtonText" : "Receive an Item"
+  }, 
+  "re_open_game" : "Plase exit the game and re-open",
+  "play" : "You use"
+}

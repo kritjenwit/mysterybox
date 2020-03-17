@@ -1,7 +1,7 @@
 <template>
   <div class="mt-5">
     <h1 class="text-center">
-      <u>รายการสินค้า</u>
+      <u>{{ $t('list_item') }}</u>
     </h1>
     <div class="row">
       <div class>
@@ -17,7 +17,7 @@
               <div class="footer">
                 <div class="left">
                   <div class="price">
-                    <span>{{ item.price }} Coupon</span>
+                    <span>{{ item.price }} {{ $t('coupon') }}</span>
                   </div>
                 </div>
                 <div class="right">
@@ -139,7 +139,13 @@
 </style>
 <script>
 import Toastify  from 'toastify-js';
+import helper from './../assets/function'
 export default {
+  data() {
+    return {
+     
+    }
+  },
   props: ["items", "picUrl"],
   methods : {
     alertImage(id) {

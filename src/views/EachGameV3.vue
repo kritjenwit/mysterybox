@@ -202,9 +202,12 @@ export default {
       boxProps : {},
       boxPropsArr : [],
       userProps : {},
+      isexchange : 0,
+      pointBefore : 0,
+      pointAfter : 0,
     };
 	},
-	computed: mapGetters(['userdata','getBoxes']),
+	computed: mapGetters(['userdata','getBoxes','getLanguage']),
   methods: {
     ...mapActions(['updatePoint','setUserData','setParams']),
     async getItems(boxId) {
@@ -394,6 +397,9 @@ export default {
         this.alertTypeCouponOption = alertOptions;
         this.alertTypeCoupon(alertOptions)
       }
+
+
+
     },
     setRound() {
       this.round = this.randomIntFromInterval(5,7);
@@ -451,19 +457,20 @@ export default {
 
       // console.log(this.boxProps);
       const boxPrice = this.boxProps.price;
+     
       // Update Point on Navbar
       this.writeLog(`[BOXID(${this.boxId}) => UPDATE POINT]`)
       this.updatePoint(this.userdata.coupon - boxPrice);
       
       this.toastMoveSpin(`กดเล่น ${boxPrice} ปอง`);
       // // API Add or Sub
-      this.writeLog(`[BOXID(${this.boxId}) => CLICK SPIN AT]:\t ${helper.dateTime()}`);
+      this.writeLog(`[BOXID(${this.boxId}) => CLICK SPIN AT]:\t ${helper.dateTime()} | Pay ${boxPrice}`);
       this.cutpoint(boxPrice)
         .then(res => {
           let afterPoint = +res.data.data.data;
           this.writeLog(`[BOXID(${this.boxId}) => RES CUT POINT]:\t ${JSON.stringify(res.data.data)}`)
           console.log('[CUTPOINT] Point After : ', afterPoint);
-
+          this.pointAfter = afterPoint;
           this.writeLog(`[BOXID(${this.boxId}) => AFTER POINT]:\t ${afterPoint}`)
         });
 
@@ -476,7 +483,6 @@ export default {
         close: true,
         gravity: "bottom", 
         position: 'right', 
-        // backgroundColor: "background-image: linear-gradient(to right, #d91111, #ed390c);",
         backgroundColor: color,
         stopOnFocus: true, 
       }).showToast();
@@ -585,7 +591,6 @@ export default {
           this.writeLog(`[BOXID(${this.boxId}) => RES RECV ITEM]:\t ${JSON.stringify(res.data.data)}`)
           console.log(res.data)
         })
-
     },
     addpoint(coupon) {
       this.writeLog(`[BOXID(${this.boxId}) => ADDPOINT]:\t ${helper.dateTime()}`);
@@ -598,6 +603,18 @@ export default {
     writeLog(message) {
       helper.writeLog(this.userdata.useridx,message)
     },
+    insertLogBet() {
+      const useridx = this.userdata.useridx;
+      const price = this.boxProps.price;
+      const boxId = this.boxId;
+      const itemId = this.selectedItem.itemId;
+      const isitem = this.selectedItem.productType == 1 ? 1 : 0;
+      const isexchange = this.selectedItem.isexchange;
+      const crystalBefore = 0;
+      const itemPong = 0;
+      const productPong = 0;
+      const timestamp = helper.time();
+    }
   },
   
   mounted() {
@@ -614,7 +631,7 @@ export default {
     await this.getItems(this.boxId);
     this.setBoxProps();
     window.me = this;
-
+    this.pointBefore = this.userdata.coupon;
     let messageLog = String();
     this.writeLog(`[BOXID(${this.boxId}) => DATETIME]:\t${helper.dateTime()}`)
     this.writeLog(`[BOXID(${this.boxId}) => IDX]:\t${this.userdata.useridx}`)

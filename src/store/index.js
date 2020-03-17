@@ -13,7 +13,8 @@ const state = {
   params : {
     data : '',
     key : ''
-  }
+  },
+  language : 'th',
 };
 
 const getters = {
@@ -21,6 +22,7 @@ const getters = {
   userdataArr : (state) => state.userArr,
   getBoxes : (state) => state.boxes,
   getParams : (state) => state.params,
+  getLanguage : (state) => state.language,
 };
 
 const actions = {
@@ -39,8 +41,6 @@ const actions = {
     const response = await axios.get(url);
     const data = response.data.data;
 
-    
-
     if(data.code != 200) {
       const user = {};
       const userdata = {};
@@ -57,6 +57,7 @@ const actions = {
     } else {
 
       const mliveData = data.data.Result;
+      const language = typeof mliveData.language != 'undefined' ? mliveData.language : 'th';
 
       const user = {
         useridx: mliveData.Useridx,
@@ -64,11 +65,13 @@ const actions = {
         key : key,
         username : mliveData.Nickname,
         coupon : mliveData.Crystal,
+        language : language
       };
 
       const userdata = userdata;
 
       await commit('setUserData',user)
+      commit('setLanguage',language)
     }
   },
   setParams({ commit },data) {
@@ -76,6 +79,9 @@ const actions = {
   },
   updatePoint({ commit },point) {
     commit('updatePoint',point);
+  },
+  setLanguage({ commit },language) {
+    commit('setLanguage',language);
   }
 };
 
@@ -90,6 +96,7 @@ const mutations = {
     state.params.data = data.data;
   },
   updatePoint : (state,point) => (state.user.coupon = point),
+  setLanguage : (state,language) => (state.language = language),
 };
 
 

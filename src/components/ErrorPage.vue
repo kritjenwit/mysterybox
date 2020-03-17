@@ -10,6 +10,7 @@
   </div>
 </template>
 <script>
+import Swal from 'sweetalert2';
 export default {
   data() {
     return {
@@ -18,11 +19,6 @@ export default {
 	},
 	created() {
     this.errorName = Buffer.from(this.$route.query.text,'base64').toString();
-    
-    setTimeout(() => {
-      alert('Exit');
-    },1000)
-
 	}
 };
 </script>
